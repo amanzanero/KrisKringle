@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Next.js" pattern="file[kriskringle]:src/pages//*" />
+</component>
