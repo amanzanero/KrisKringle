@@ -22,24 +22,32 @@ const Index: NextPage = () => {
           <div className="grid auto-cols-max grid-flow-col gap-5 text-center">
             <div className="rounded-box flex flex-col bg-neutral p-2 text-neutral-content">
               <span className="countdown font-mono text-5xl">
+                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                {/* @ts-ignore */}
                 <span style={{ "--value": christmas.days }}></span>
               </span>
               days
             </div>
             <div className="rounded-box flex flex-col bg-neutral p-2 text-neutral-content">
               <span className="countdown font-mono text-5xl">
+                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                {/* @ts-ignore */}
                 <span style={{ "--value": christmas.hours }}></span>
               </span>
               hours
             </div>
             <div className="rounded-box flex flex-col bg-neutral p-2 text-neutral-content">
               <span className="countdown font-mono text-5xl">
+                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                {/* @ts-ignore */}
                 <span style={{ "--value": christmas.minutes }}></span>
               </span>
               min
             </div>
             <div className="rounded-box flex flex-col bg-neutral p-2 text-neutral-content">
               <span className="countdown font-mono text-5xl">
+                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                {/* @ts-ignore */}
                 <span style={{ "--value": christmas.seconds }}></span>
               </span>
               sec
