@@ -9,7 +9,14 @@ import { createTrpcSsr } from "../utils/ssr";
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getServerAuthSession(context);
   if (!session) {
-    return { redirect: { destination: "/api/auth/signin", permanent: false } };
+    return {
+      redirect: {
+        destination: `/api/auth/signin?callbackUrl=${encodeURIComponent(
+          "/home",
+        )}`,
+        permanent: false,
+      },
+    };
   }
   const ssr = await createTrpcSsr(context);
   await ssr.secretSantaGroup.getAll.fetch();
