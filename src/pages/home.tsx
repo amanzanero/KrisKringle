@@ -9,6 +9,7 @@ import { createTrpcSsr } from "../utils/ssr";
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getServerAuthSession(context);
   if (!session) {
+    console.log("user no has session");
     return {
       redirect: {
         destination: `/api/auth/signin?callbackUrl=${encodeURIComponent(
@@ -18,6 +19,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
+  console.log("user has session");
   const ssr = await createTrpcSsr(context);
   await ssr.secretSantaGroup.getAll.fetch();
   return {
