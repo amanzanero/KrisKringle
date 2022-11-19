@@ -7,19 +7,23 @@ type Timer = {
   minutes: number;
   seconds: number;
   difference: number;
+  christmas: string;
 };
 
 export function useChristmas() {
+  const now = dayjs();
   const [timer, setTimer] = useState<Timer>({
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0,
     difference: 0,
+    christmas: `December 25th, ${now.year()}`,
   });
   useEffect(() => {
     const calculateTimertime = () => {
       const now = dayjs();
+      const christmas = `December 25th, ${now.year()}`;
       const christmasThisYear = dayjs(`${now.year()}-12-25`);
       const diff = christmasThisYear.diff(now, "seconds");
       let difference = diff;
@@ -37,7 +41,7 @@ export function useChristmas() {
       const minutes = difference >= 60 ? Math.floor(difference / 60) : 0;
       difference -= minutes * 60;
       const seconds = difference;
-      setTimer({ days, hours, minutes, seconds, difference: diff });
+      setTimer({ days, hours, minutes, seconds, difference: diff, christmas });
     };
     calculateTimertime();
     const intervalId = setInterval(calculateTimertime, 1000);
