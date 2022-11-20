@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { publicProcedure, protectedProcedure, router } from "../trpc";
 import dayjs from "dayjs";
+import { group } from "console";
 
 export const secretSantaGroupRouter = router({
   create: publicProcedure
@@ -24,7 +25,15 @@ export const secretSantaGroupRouter = router({
     }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
-    const allGroups = ctx.prisma.secretSantaGroup.findMany({ where: { ownerId: user.id } });
-    return await allGroups;
+    const allGroups = await ctx.prisma.secretSantaGroup.findMany({
+      where: { ownerId: user.id },
+      include: {
+        memberWishlists: true,
+      },
+    });
+    return allGroups.map((group) => ({
+      ...group,
+      memberWishlists: group.memberWishlists.length,
+    }));
   }),
 });
