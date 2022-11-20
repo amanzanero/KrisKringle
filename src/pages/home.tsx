@@ -6,6 +6,7 @@ import NavLayout from "../lib/layouts/NavLayout";
 import { useSessionOrRedirect } from "../utils/auth";
 import { type inferProcedureOutput } from "@trpc/server";
 import { type AppRouter } from "../server/trpc/router/_app";
+import { appLogger } from "../lib/appLogger";
 
 const Home: NextPage = () => {
   const { data: session } = useSessionOrRedirect();
@@ -13,6 +14,7 @@ const Home: NextPage = () => {
     enabled: session != null,
     refetchOnWindowFocus: true,
   });
+  appLogger.info("pageLand");
 
   return (
     <>
