@@ -1,11 +1,10 @@
 import { z } from "zod";
 
-import { publicProcedure, protectedProcedure, router } from "../trpc";
+import { protectedProcedure, router } from "../trpc";
 import dayjs from "dayjs";
-import { group } from "console";
 
 export const secretSantaGroupRouter = router({
-  create: publicProcedure
+  create: protectedProcedure
     .input(
       z.object({
         name: z.string().max(100),
@@ -14,14 +13,20 @@ export const secretSantaGroupRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const currentYear = dayjs().year();
-      const result = await ctx.prisma.secretSantaGroup.create({
+      const group = await ctx.prisma.secretSantaGroup.create({
         data: {
           name: input.name,
           year: currentYear,
-          owner: { connect: { id: ctx.session?.user?.id } },
+          owner: { connect: { id: ctx.session.user.id } },
         },
       });
-      return result;
+      await ctx.prisma.wishlist.create({
+        data: {
+          userId: ctx.session.user.id,
+          secretSantaGroupId: group.id,
+        },
+      });
+      return group;
     }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
@@ -31,6 +36,7 @@ export const secretSantaGroupRouter = router({
         memberWishlists: true,
       },
     });
+    ctx.logger.debug("yerppp");
     return allGroups.map((group) => ({
       ...group,
       memberWishlists: group.memberWishlists.length,
