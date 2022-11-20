@@ -1,30 +1,9 @@
-import type { GetServerSideProps, NextPage } from "next";
+import type { NextPage } from "next";
 import Head from "next/head";
 import React from "react";
 import { trpc } from "../utils/trpc";
 import NavLayout from "../lib/layouts/NavLayout";
-import { getServerAuthSession } from "../server/common/get-server-auth-session";
-import { createTrpcSsr } from "../utils/ssr";
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerAuthSession(context);
-  if (!session) {
-    return {
-      redirect: {
-        destination: `/api/auth/signin?callbackUrl=${encodeURIComponent(
-          "/home",
-        )}`,
-        permanent: false,
-      },
-    };
-  }
-  const ssr = await createTrpcSsr(context);
-  await ssr.secretSantaGroup.getAll.fetch();
-  return {
-    props: { trpcState: ssr.dehydrate() },
-  };
-  return { props: {} };
-};
+import { useSessionOrRedirect } from "../utils/auth";
 
 const Home: NextPage = () => {
   return (
@@ -47,8 +26,9 @@ const Home: NextPage = () => {
 };
 
 const Table = () => {
+  const { data: session } = useSessionOrRedirect();
   const { isLoading, data } = trpc.secretSantaGroup.getAll.useQuery(undefined, {
-    enabled: false,
+    enabled: session != null,
     refetchOnWindowFocus: true,
   });
 
