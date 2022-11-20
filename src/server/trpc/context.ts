@@ -1,10 +1,11 @@
 import { type inferAsyncReturnType } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
-import { type Logger } from "pino";
+import { type Logger } from "next-axiom";
 import { getServerAuthSession } from "../common/get-server-auth-session";
 import { prisma } from "../db/client";
 import { logger as baseLogger } from "../logger";
+import { randomUUID } from "crypto";
 
 type CreateContextOptions = {
   session: Session | null;
@@ -33,9 +34,9 @@ export const createContext = async (opts: CreateNextContextOptions) => {
 
   // Get the session from the server using the unstable_getServerSession wrapper function
   const session = await getServerAuthSession({ req, res });
-  const logger = baseLogger.child({
+  const logger = baseLogger.with({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    reqId: (req as any).id,
+    reqId: randomUUID(),
     userId: session?.user?.id,
   });
   return await createContextInner({
