@@ -36,7 +36,7 @@ export const secretSantaGroupRouter = router({
         memberWishlists: true,
       },
     });
-    ctx.logger.debug("yerppp");
+    ctx.logger.info("secretSantaGroup created");
     return allGroups.map((group) => ({
       ...group,
       memberWishlists: group.memberWishlists.length,
