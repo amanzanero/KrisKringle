@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { protectedProcedure, router } from "../trpc";
 import dayjs from "dayjs";
+import { TRPCError } from "@trpc/server";
+import { nanoid } from "../../common/idutil";
 
 export const secretSantaGroupRouter = router({
   create: protectedProcedure
@@ -18,6 +20,7 @@ export const secretSantaGroupRouter = router({
           name: input.name,
           year: currentYear,
           owner: { connect: { id: ctx.session.user.id } },
+          slug: nanoid(),
         },
       });
       await ctx.prisma.wishlist.create({
@@ -36,10 +39,40 @@ export const secretSantaGroupRouter = router({
         memberWishlists: true,
       },
     });
-    ctx.logger.info("secretSantaGroup created");
     return allGroups.map((group) => ({
       ...group,
       memberWishlists: group.memberWishlists.length,
     }));
   }),
+  getBySlug: protectedProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      const group = await ctx.prisma.secretSantaGroup.findUnique({
+        where: {
+          slug: input.slug,
+        },
+        include: {
+          memberWishlists: {},
+        },
+      });
+
+      if (!group) {
+        return new TRPCError({
+          code: "NOT_FOUND",
+        });
+      } else if (
+        !group?.memberWishlists.map((wl) => wl.userId).includes(user.id)
+      ) {
+        return new TRPCError({
+          code: "UNAUTHORIZED",
+        });
+      } else {
+        return group;
+      }
+    }),
 });

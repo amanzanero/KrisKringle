@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { PrismaClient } from "@prisma/client";
+import { customAlphabet } from "nanoid";
+
+const alphabet =
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const nanoid = customAlphabet(alphabet, 21);
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -10,13 +16,14 @@ async function main() {
   const user3 = await prisma.user.create({ data: { name: "Jane Doe" } });
   const mainGroup = await prisma.secretSantaGroup.create({
     data: {
-      ownerId: user1!.id,
+      ownerId: user1.id,
       name: "secret santa 2022",
       year: 2022,
+      slug: nanoid(),
     },
   });
   const mainAssignment1 = await prisma.secretSantaGroupOnWishlist.create({
-    data: { gifterId: user1!.id, secretSantaGroupId: mainGroup.id },
+    data: { gifterId: user1.id, secretSantaGroupId: mainGroup.id },
   });
   const mainAssignment2 = await prisma.secretSantaGroupOnWishlist.create({
     data: { gifterId: user2.id, secretSantaGroupId: mainGroup.id },
@@ -26,14 +33,14 @@ async function main() {
   });
   await prisma.wishlist.create({
     data: {
-      userId: user1!.id,
+      userId: user1.id,
       secretSantaGroupId: mainGroup.id,
       secretSantaGroupOnWishlistId: mainAssignment1.id,
     },
   });
   await prisma.wishlist.create({
     data: {
-      userId: user2!.id,
+      userId: user2.id,
       secretSantaGroupId: mainGroup.id,
       secretSantaGroupOnWishlistId: mainAssignment2.id,
     },
@@ -49,9 +56,10 @@ async function main() {
   // doesnt include user1
   const otherGroup = await prisma.secretSantaGroup.create({
     data: {
-      ownerId: user2!.id,
+      ownerId: user2.id,
       name: "GROUP I SHOULDNT SEE",
       year: 2022,
+      slug: nanoid(),
     },
   });
   const otherAssignment2 = await prisma.secretSantaGroupOnWishlist.create({
@@ -62,7 +70,7 @@ async function main() {
   });
   await prisma.wishlist.create({
     data: {
-      userId: user2!.id,
+      userId: user2.id,
       secretSantaGroupId: otherGroup.id,
       secretSantaGroupOnWishlistId: otherAssignment2.id,
     },

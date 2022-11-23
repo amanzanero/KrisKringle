@@ -6,7 +6,7 @@ import NavLayout from "../lib/layouts/NavLayout";
 import { useSessionOrRedirect } from "../utils/auth";
 import { type inferProcedureOutput } from "@trpc/server";
 import { type AppRouter } from "../server/trpc/router/_app";
-import { appLogger } from "../lib/appLogger";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
   const { data: session } = useSessionOrRedirect();
@@ -14,7 +14,6 @@ const Home: NextPage = () => {
     enabled: session != null,
     refetchOnWindowFocus: true,
   });
-  appLogger.info("pageLand");
 
   return (
     <>
@@ -39,6 +38,8 @@ const Table: React.FC<{
   isLoading: boolean;
   data?: inferProcedureOutput<AppRouter["secretSantaGroup"]["getAll"]>;
 }> = ({ isLoading, data }) => {
+  const router = useRouter();
+
   if (isLoading || !data) {
     return (
       <div className="w-full pt-2 sm:pt-10">
@@ -69,7 +70,11 @@ const Table: React.FC<{
         </thead>
         <tbody>
           {data.map((group) => (
-            <tr key={group.id} className="hover cursor-pointer">
+            <tr
+              key={group.id}
+              onClick={() => router.push(`/secretsanta/${group.slug}`)}
+              className="hover cursor-pointer"
+            >
               <th>1</th>
               <td>{group.name}</td>
               <td>{group.year}</td>

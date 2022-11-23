@@ -78,6 +78,7 @@ model SecretSantaGroup {
   year            Int
   assignments     SecretSantaGroupOnWishlist[]
   memberWishlists Wishlist[]
+  slug            String                       @unique
   createdAt       DateTime                     @default(now())
 }
 
