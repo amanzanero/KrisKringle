@@ -77,7 +77,7 @@ model SecretSantaGroup {
   ownerId         String
   year            Int
   assignments     SecretSantaGroupOnWishlist[]
-  memberWishlists Wishlist[]
+  memberWishlists Wishlist[]                   @relation("secretSantaWishlist")
   slug            String                       @unique
   createdAt       DateTime                     @default(now())
 }
@@ -97,7 +97,7 @@ model Wishlist {
   user                         User                        @relation(fields: [userId], references: [id])
   userId                       String
   entries                      WishlistEntry[]
-  secretSantaGroup             SecretSantaGroup            @relation(fields: [secretSantaGroupId], references: [id])
+  secretSantaGroup             SecretSantaGroup            @relation("secretSantaWishlist", fields: [secretSantaGroupId], references: [id])
   secretSantaGroupId           String
   secretSantaGroupOnWishlist   SecretSantaGroupOnWishlist? @relation("wishlist", fields: [secretSantaGroupOnWishlistId], references: [id])
   secretSantaGroupOnWishlistId String?                     @unique

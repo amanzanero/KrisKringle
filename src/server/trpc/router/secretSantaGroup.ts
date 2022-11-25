@@ -31,6 +31,7 @@ export const secretSantaGroupRouter = router({
       });
       return group;
     }),
+
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
     const allGroups = await ctx.prisma.secretSantaGroup.findMany({
@@ -44,6 +45,7 @@ export const secretSantaGroupRouter = router({
       memberWishlists: group.memberWishlists.length,
     }));
   }),
+
   getBySlug: protectedProcedure
     .input(
       z.object({
@@ -57,22 +59,25 @@ export const secretSantaGroupRouter = router({
           slug: input.slug,
         },
         include: {
-          memberWishlists: {},
+          memberWishlists: {
+            include: {
+              user: true,
+            },
+          },
+          owner: true,
         },
       });
-
       if (!group) {
-        return new TRPCError({
+        throw new TRPCError({
           code: "NOT_FOUND",
         });
       } else if (
         !group?.memberWishlists.map((wl) => wl.userId).includes(user.id)
       ) {
-        return new TRPCError({
+        throw new TRPCError({
           code: "UNAUTHORIZED",
         });
-      } else {
-        return group;
       }
+      return group;
     }),
 });

@@ -25,6 +25,21 @@ export const trpc = createTRPCNext<AppRouter>({
           url: `${getBaseUrl()}/api/trpc`,
         }),
       ],
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            retry(failureCount, error) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const httpStatus = (error as any).data?.httpStatus;
+              // don't retry any client-side errors
+              if (httpStatus && Math.floor(httpStatus / 100) === 4) {
+                return false;
+              }
+              return failureCount < 3;
+            },
+          },
+        },
+      },
     };
   },
   ssr: false,

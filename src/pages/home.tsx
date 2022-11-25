@@ -1,12 +1,14 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import React from "react";
+import { UserIcon } from "@heroicons/react/24/solid";
 import { trpc } from "../utils/trpc";
 import NavLayout from "../lib/layouts/NavLayout";
 import { useSessionOrRedirect } from "../utils/auth";
 import { type inferProcedureOutput } from "@trpc/server";
 import { type AppRouter } from "../server/trpc/router/_app";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const Home: NextPage = () => {
   const { data: session } = useSessionOrRedirect();
@@ -23,9 +25,6 @@ const Home: NextPage = () => {
       <NavLayout>
         <main className="flex w-full flex-col items-center">
           <div className="mt-2 w-full max-w-screen-lg rounded-md px-2 sm:mt-5 sm:px-4 sm:pt-5">
-            <h1 className="text-xl font-semibold text-base-content">
-              My Secret Santa Groups
-            </h1>
             <Table isLoading={isLoading} data={data} />
           </div>
         </main>
@@ -50,41 +49,65 @@ const Table: React.FC<{
 
   if (data && data.length === 0) {
     return (
-      <div className="flex w-full justify-center pt-10">
-        <button className="btn-primary btn">Start a Secret Santa Group</button>
-      </div>
+      <>
+        <h1 className="w-full pt-5 text-center text-xl font-bold sm:pt-10">
+          You&apos;re not part of any groups yet!
+        </h1>
+        <div className="flex w-full flex-wrap justify-center space-y-3 pt-3 sm:flex-nowrap sm:space-x-3 sm:space-y-0 sm:pt-5">
+          <Link href="/secretsanta/create" className="w-full sm:w-fit">
+            <button className="btn-primary btn w-full">
+              Start a Secret Santa Group
+            </button>
+          </Link>
+          <Link href="/secretsanta/join" className="w-full sm:w-fit">
+            <button className="btn-base btn w-full">
+              Join an existing group
+            </button>
+          </Link>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="mt-2 overflow-x-auto rounded-lg outline outline-1 outline-gray-300 sm:mt-5">
-      <table className="table w-full">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Group name</th>
-            <th>Year</th>
-            <th>Members</th>
-            <th>Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((group) => (
-            <tr
-              key={group.id}
-              onClick={() => router.push(`/secretsanta/${group.slug}`)}
-              className="hover cursor-pointer"
-            >
-              <th>1</th>
-              <td>{group.name}</td>
-              <td>{group.year}</td>
-              <td>{group.memberWishlists}</td>
-              <td>{group.createdAt.toDateString()}</td>
+    <>
+      <h1 className="text-xl font-semibold text-base-content">
+        My Secret Santa Groups
+      </h1>
+      <div className="mt-2 overflow-x-auto rounded-lg outline outline-1 outline-gray-300 sm:mt-5">
+        <table className="table w-full">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Group name</th>
+              <th>Year</th>
+              <th>Members</th>
+              <th>Created</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {data.map((group, index) => (
+              <tr
+                key={group.id}
+                onClick={() => router.push(`/secretsanta/${group.slug}`)}
+                className="hover cursor-pointer"
+              >
+                <th>{index + 1}</th>
+                <td>{group.name}</td>
+                <td>{group.year}</td>
+                <td>
+                  <div className="flex items-center">
+                    <UserIcon className="mr-2 inline-block h-4 w-4" />
+                    {group.memberWishlists}
+                  </div>
+                </td>
+                <td>{group.createdAt.toDateString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };
 
