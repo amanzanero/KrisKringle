@@ -12,9 +12,11 @@ const Navbar = () => {
       </div>
       <div className="flex-none">
         <ul className="menu menu-horizontal p-0">
-          <li>
-            <Link href="/home">Home</Link>
-          </li>
+          {status === "authenticated" ? (
+            <li>
+              <Link href="/home">Home</Link>
+            </li>
+          ) : undefined}
           <li>
             {status === "authenticated" ? (
               <button onClick={() => signOut()}>Log Out</button>
