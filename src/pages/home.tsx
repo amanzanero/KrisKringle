@@ -4,14 +4,14 @@ import React from "react";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { trpc } from "../utils/trpc";
 import NavLayout from "../lib/layouts/NavLayout";
-import { useSessionOrRedirect } from "../utils/auth";
 import { type inferProcedureOutput } from "@trpc/server";
 import { type AppRouter } from "../server/trpc/router/_app";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 const Home: NextPage = () => {
-  const { data: session } = useSessionOrRedirect();
+  const { data: session } = useSession({ required: true });
   const { isLoading, data } = trpc.secretSantaGroup.getAll.useQuery(undefined, {
     enabled: session != null,
     refetchOnWindowFocus: true,

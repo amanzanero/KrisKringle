@@ -1,15 +1,15 @@
 import { type inferProcedureOutput } from "@trpc/server";
 import { type NextPage } from "next";
 import { type Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import NavLayout from "../../lib/layouts/NavLayout";
 import { type AppRouter } from "../../server/trpc/router/_app";
-import { useSessionOrRedirect } from "../../utils/auth";
 import { trpc } from "../../utils/trpc";
 
 const SecretSanta: NextPage = () => {
-  const { data: session } = useSessionOrRedirect();
+  const { data: session } = useSession({ required: true });
   const { isReady, query, push } = useRouter();
   const { slug } = query;
   const { isLoading, data } = trpc.secretSantaGroup.getBySlug.useQuery(

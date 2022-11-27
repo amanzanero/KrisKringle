@@ -4,13 +4,13 @@ import { protectedProcedure, router } from "../trpc";
 import dayjs from "dayjs";
 import { TRPCError } from "@trpc/server";
 import { nanoid } from "../../common/idutil";
+import { InviteStatus } from "../../common/ constants";
 
 export const secretSantaGroupRouter = router({
   create: protectedProcedure
     .input(
       z.object({
         name: z.string().max(100),
-        emails: z.array(z.string().email()),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -30,6 +30,40 @@ export const secretSantaGroupRouter = router({
         },
       });
       return group;
+    }),
+
+  join: protectedProcedure
+    .input(
+      z.object({
+        code: z.string(), // aka slug
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const group = await ctx.prisma.secretSantaGroup.findUnique({
+        where: { slug: input.code },
+        include: { memberWishlists: true },
+      });
+      if (!group) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const existingWishlist = group.memberWishlists.find((wishlist) => {
+        wishlist.userId === ctx.session.user.id;
+      });
+      if (!!existingWishlist) {
+        // already joined this secret santa group
+        return existingWishlist;
+      }
+
+      // create a wishlist and add it
+      const wishlist = await ctx.prisma.wishlist.create({
+        data: {
+          userId: ctx.session.user.id,
+          secretSantaGroupId: group.id,
+        },
+      });
+
+      return wishlist;
     }),
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
