@@ -71,9 +71,26 @@ const Table: React.FC<{
 
   return (
     <>
-      <h1 className="text-xl font-semibold text-base-content">
-        My Secret Santa Groups
-      </h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-base-content">
+          My Secret Santa Groups
+        </h1>
+        <div className="flex sm:space-x-2">
+          <button
+            className="btn-primary btn"
+            onClick={() => router.push("/secretsanta/join")}
+          >
+            Join
+          </button>
+          <button
+            className="btn"
+            onClick={() => router.push("/secretsanta/create")}
+          >
+            Create
+          </button>
+        </div>
+      </div>
+      <div className="divider"></div>
       <div className="mt-2 overflow-x-auto rounded-lg outline outline-1 outline-gray-300 sm:mt-5">
         <table className="table w-full">
           <thead>

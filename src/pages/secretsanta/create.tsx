@@ -1,7 +1,12 @@
 import { type NextPage } from "next";
 import NavLayout from "../../lib/layouts/NavLayout";
-// import { trpc } from "../../utils/trpc";
+import { trpc } from "../../utils/trpc";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { useSession } from "next-auth/react";
+import Alert from "../../lib/components/Alert";
+import { useErrorMessage } from "../../lib/hooks/errormessage";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 type Inputs = {
   name: string;
@@ -9,8 +14,10 @@ type Inputs = {
 };
 
 const CreateSecretSantaGroup: NextPage = () => {
-  // const secretSantaMutation = trpc.secretSantaGroup.create.useMutation();
-  // const session = useSessionOrRedirect();
+  useSession({ required: true });
+  const secretSantaMutation = trpc.secretSantaGroup.create.useMutation();
+  const { isLoading, error, data, isSuccess } = secretSantaMutation;
+  const { push } = useRouter();
 
   const {
     register,
@@ -18,17 +25,26 @@ const CreateSecretSantaGroup: NextPage = () => {
     formState: { errors },
   } = useForm<Inputs>();
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    secretSantaMutation.mutate({ name: data.name });
+  };
+
+  const errorMessage = useErrorMessage(error);
+
+  useEffect(() => {
+    if (isSuccess && !!data) {
+      push(`/secretsanta/${data.slug}`);
+    }
+  }, [push, isSuccess, data]);
 
   return (
     <NavLayout>
       <main className="flex w-full flex-col items-center">
+        {isLoading && <progress className="progress w-full" />}
         <div className="mt-2 w-full px-2 sm:mt-5 sm:max-w-screen-sm sm:px-4 sm:pt-5">
           <h1 className="text-xl font-bold">Create a Secret Santa Group</h1>
-          <form
-            className="w-full pt-3 sm:pt-5"
-            onSubmit={handleSubmit(onSubmit)}
-          >
+          <div className="divider"></div>
+          <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex w-full flex-col items-center">
               <div className="w-full">
                 <label className="label">
@@ -46,12 +62,18 @@ const CreateSecretSantaGroup: NextPage = () => {
                   </span>
                 )}
               </div>
-              <div className="flex w-full">
+              <div className="flex w-full flex-col">
                 <input
+                  disabled={isLoading}
                   className="btn mt-4 w-full"
                   type="submit"
                   value="create"
                 />
+                {!!errorMessage && (
+                  <div className="w-full py-2">
+                    <Alert text={errorMessage} />
+                  </div>
+                )}
               </div>
             </div>
           </form>
