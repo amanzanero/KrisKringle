@@ -71,19 +71,19 @@ const Table: React.FC<{
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-base-content">
+      <div className="flex flex-wrap items-center sm:flex-nowrap sm:justify-between">
+        <h1 className="w-full text-xl font-semibold text-base-content sm:w-fit">
           My Secret Santa Groups
         </h1>
-        <div className="flex sm:space-x-2">
+        <div className="mt-5 flex w-full space-x-2 sm:mt-0 sm:w-fit">
           <button
-            className="btn-primary btn"
+            className="btn-primary btn grow"
             onClick={() => router.push("/secretsanta/join")}
           >
             Join
           </button>
           <button
-            className="btn"
+            className="btn grow"
             onClick={() => router.push("/secretsanta/create")}
           >
             Create
@@ -91,25 +91,22 @@ const Table: React.FC<{
         </div>
       </div>
       <div className="divider"></div>
-      <div className="mt-2 overflow-x-auto rounded-lg outline outline-1 outline-gray-300 sm:mt-5">
+      <div className="mt-2 overflow-x-auto rounded-lg outline outline-2 outline-gray-300 dark:outline-gray-700 sm:mt-5">
         <table className="table w-full">
           <thead>
             <tr>
-              <th></th>
               <th>Group name</th>
               <th>Year</th>
               <th>Members</th>
-              <th>Created</th>
             </tr>
           </thead>
           <tbody>
-            {data.map((group, index) => (
+            {data.map((group) => (
               <tr
                 key={group.id}
                 onClick={() => router.push(`/secretsanta/${group.slug}`)}
                 className="hover cursor-pointer"
               >
-                <th>{index + 1}</th>
                 <td>{group.name}</td>
                 <td>{group.year}</td>
                 <td>
@@ -118,7 +115,6 @@ const Table: React.FC<{
                     {group.memberWishlists}
                   </div>
                 </td>
-                <td>{group.createdAt.toDateString()}</td>
               </tr>
             ))}
           </tbody>

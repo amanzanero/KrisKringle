@@ -36,6 +36,7 @@ async function main() {
       userId: user1.id,
       secretSantaGroupId: mainGroup.id,
       secretSantaGroupOnWishlistId: mainAssignment1.id,
+      slug: nanoid(),
     },
   });
   await prisma.wishlist.create({
@@ -43,6 +44,7 @@ async function main() {
       userId: user2.id,
       secretSantaGroupId: mainGroup.id,
       secretSantaGroupOnWishlistId: mainAssignment2.id,
+      slug: nanoid(),
     },
   });
   await prisma.wishlist.create({
@@ -50,6 +52,7 @@ async function main() {
       userId: user3.id,
       secretSantaGroupId: mainGroup.id,
       secretSantaGroupOnWishlistId: mainAssignment3.id,
+      slug: nanoid(),
     },
   });
 
@@ -73,6 +76,7 @@ async function main() {
       userId: user2.id,
       secretSantaGroupId: otherGroup.id,
       secretSantaGroupOnWishlistId: otherAssignment2.id,
+      slug: nanoid(),
     },
   });
   await prisma.wishlist.create({
@@ -80,6 +84,7 @@ async function main() {
       userId: user3.id,
       secretSantaGroupId: otherGroup.id,
       secretSantaGroupOnWishlistId: otherAssignment3.id,
+      slug: nanoid(),
     },
   });
 }

@@ -1,5 +1,6 @@
 import { type NextPage } from "next";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -42,9 +43,17 @@ const JoinSecretSantaGroup: NextPage = () => {
 
   return (
     <NavLayout>
-      <main className="flex w-full flex-col items-center">
+      <main className="flex w-full flex-col items-center px-2 sm:px-4 ">
         {isLoading && <progress className="progress w-full" />}
-        <div className="mt-2 w-full px-2 sm:mt-5 sm:max-w-screen-sm sm:px-4 sm:pt-5">
+        <div className="breadcrumbs w-full text-sm sm:max-w-screen-sm ">
+          <ul>
+            <li>
+              <Link href="/home">Home</Link>
+            </li>
+            <li>Join Group</li>
+          </ul>
+        </div>
+        <div className="mt-2 w-full sm:mt-5 sm:max-w-screen-sm sm:pt-5">
           <h1 className="mx-auto text-xl font-bold">
             Join existing Secret Santa Group
           </h1>
@@ -57,7 +66,7 @@ const JoinSecretSantaGroup: NextPage = () => {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. 123456"
+                  placeholder="Code that was shared with you e.g. 123456"
                   className="input-bordered input w-full"
                   {...register("code", { required: true })}
                 />

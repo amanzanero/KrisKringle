@@ -80,6 +80,8 @@ model SecretSantaGroup {
   memberWishlists Wishlist[]                   @relation("secretSantaWishlist")
   slug            String                       @unique
   createdAt       DateTime                     @default(now())
+
+  @@unique([id, ownerId])
 }
 
 model SecretSantaGroupOnWishlist {
@@ -93,9 +95,11 @@ model SecretSantaGroupOnWishlist {
 }
 
 model Wishlist {
-  id                           String                      @id @default(cuid())
-  user                         User                        @relation(fields: [userId], references: [id])
-  userId                       String
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  slug   String @unique
+
   entries                      WishlistEntry[]
   secretSantaGroup             SecretSantaGroup            @relation("secretSantaWishlist", fields: [secretSantaGroupId], references: [id])
   secretSantaGroupId           String
@@ -103,6 +107,8 @@ model Wishlist {
   secretSantaGroupOnWishlistId String?                     @unique
   createdAt                    DateTime                    @default(now())
   updatedAt                    DateTime                    @updatedAt
+
+  @@index([secretSantaGroupId, slug])
 }
 
 model WishlistEntry {
@@ -111,6 +117,7 @@ model WishlistEntry {
   link        String?
   wishlist    Wishlist @relation(fields: [wishlistId], references: [id])
   wishlistId  String
+  price       Float
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

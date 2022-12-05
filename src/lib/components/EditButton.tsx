@@ -8,7 +8,7 @@ type EditButtonProps = {
 
 const EditButton: React.FC<EditButtonProps> = (props) => (
   <button
-    className={classnames(props.className, "btn-sm btn-circle btn")}
+    className={classnames(props.className, "btn-sm btn")}
     onClick={props.onClick}
   >
     <PencilIcon className="h-4 w-4" />
