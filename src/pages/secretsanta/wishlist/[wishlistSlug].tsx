@@ -32,13 +32,14 @@ const Wishlist: NextPage = () => {
   const isOwner = data?.userId === session?.user?.id;
 
   const utils = trpc.useContext();
-  const { isLoading, mutate } = trpc.wishlist.createEntry.useMutation({
-    onSuccess: () => {
-      if (!!data) {
-        utils.wishlist.getBySlug.invalidate({ slug: data.slug });
-      }
-    },
-  });
+  const { isLoading: isSubmitting, mutate } =
+    trpc.wishlist.createEntry.useMutation({
+      onSuccess: () => {
+        if (!!data) {
+          utils.wishlist.getBySlug.invalidate({ slug: data.slug });
+        }
+      },
+    });
 
   const {
     register,
@@ -97,7 +98,7 @@ const Wishlist: NextPage = () => {
               </label>
               <input
                 type="text"
-                disabled={isLoading}
+                disabled={isSubmitting}
                 placeholder="https://linktocoolsite.com"
                 className="input-bordered input w-full"
                 {...register("link", { required: false })}
@@ -114,7 +115,7 @@ const Wishlist: NextPage = () => {
               </label>
               <input
                 type="text"
-                disabled={isLoading}
+                disabled={isSubmitting}
                 placeholder="example: Blue socks size 9"
                 className="input-bordered input w-full"
                 {...register("description")}
@@ -132,7 +133,8 @@ const Wishlist: NextPage = () => {
               <input
                 type="number"
                 placeholder="30"
-                disabled={isLoading}
+                disabled={isSubmitting}
+                step="0.01"
                 className="input-bordered input w-full"
                 {...register("priceUsd")}
               />
@@ -150,7 +152,7 @@ const Wishlist: NextPage = () => {
                 className="btn w-full sm:w-fit"
                 type="submit"
                 value="add"
-                disabled={isLoading}
+                disabled={isSubmitting}
               />
             </div>
           </form>
