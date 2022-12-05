@@ -21,6 +21,7 @@ const create = protectedProcedure
       data: {
         userId: ctx.session.user.id,
         secretSantaGroupId: group.id,
+        slug: nanoid(),
       },
     });
     return group;
@@ -47,7 +48,11 @@ const join = protectedProcedure
 
     // create a wishlist and add it
     await ctx.prisma.wishlist.create({
-      data: { userId: ctx.session.user.id, secretSantaGroupId: group.id },
+      data: {
+        userId: ctx.session.user.id,
+        secretSantaGroupId: group.id,
+        slug: nanoid(),
+      },
       select: {},
     });
     return group;

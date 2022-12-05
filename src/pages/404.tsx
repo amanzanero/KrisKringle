@@ -18,7 +18,7 @@ const NotFound: NextPage = () => {
         <main className="flex w-full flex-col items-center">
           <div className="mt-2 flex w-full max-w-screen-lg flex-col items-center rounded-md px-2 sm:mt-5 sm:px-4 sm:pt-5">
             <h1 className="text-xl font-bold">
-              Sorry, we couldn't find that page.
+              Sorry, we couldn&apos;t find that page.
             </h1>
             {status == "authenticated" && (
               <button className="btn mt-2" onClick={() => router.push("/home")}>
