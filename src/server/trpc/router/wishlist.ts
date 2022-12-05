@@ -16,7 +16,9 @@ export const getBySlug = protectedProcedure
             name: true,
           },
         },
-        entries: true,
+        entries: {
+          orderBy: { createdAt: "desc" },
+        },
         user: true,
       },
     });
@@ -64,7 +66,24 @@ export const createEntry = protectedProcedure
     return entry;
   });
 
+const deleteItemFromWishlist = protectedProcedure
+  .input(z.object({ id: z.string() }))
+  .mutation(async ({ ctx, input }) => {
+    const entry = await ctx.prisma.wishlistEntry.findUnique({
+      where: { id: input.id },
+      include: { wishlist: true },
+    });
+    if (!entry) {
+      throw new TRPCError({ code: "NOT_FOUND" });
+    } else if (entry.wishlist.userId != ctx.session.user.id) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    await ctx.prisma.wishlistEntry.delete({ where: { id: input.id } });
+    return;
+  });
+
 export const wishlistRouter = router({
   getBySlug,
   createEntry,
+  deleteItemFromWishlist,
 });

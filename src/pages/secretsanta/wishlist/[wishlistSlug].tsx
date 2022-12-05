@@ -4,13 +4,14 @@ import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import NavLayout from "../../../lib/layouts/NavLayout";
 import { type AppRouter } from "../../../server/trpc/router/_app";
 import { trpc } from "../../../utils/trpc";
-import { z } from "zod";
+import { classnames } from "../../../lib/classnames";
 
 const Wishlist: NextPage = () => {
   const { data: session } = useSession({ required: true });
@@ -156,7 +157,10 @@ const Wishlist: NextPage = () => {
               />
             </div>
           </form>
-          <Entries entries={data.entries} />
+          <Entries
+            entries={data.entries}
+            stageForDeletion={(id) => setEntryIdToDelete(id)}
+          />
         </>
       );
     } else {
@@ -167,6 +171,16 @@ const Wishlist: NextPage = () => {
       );
     }
   };
+
+  const [entryIdToDelete, setEntryIdToDelete] = useState<string>();
+  const deleteMutation = trpc.wishlist.deleteItemFromWishlist.useMutation({
+    onSuccess: () => {
+      if (!!data) {
+        utils.wishlist.getBySlug.invalidate({ slug: data.slug });
+      }
+      setEntryIdToDelete(undefined);
+    },
+  });
 
   return (
     <>
@@ -194,8 +208,36 @@ const Wishlist: NextPage = () => {
               </li>
             </ul>
           </div>
-          <div className="mt-2 w-full max-w-screen-lg rounded-md sm:mt-5">
+          <div className="mt-2 mb-5 w-full max-w-screen-lg rounded-md sm:mt-5">
             <Content />
+          </div>
+          <div
+            className={classnames(!!entryIdToDelete && "modal-open", "modal")}
+            onClick={() => setEntryIdToDelete(undefined)}
+          >
+            <div className="modal-box">
+              <h3 className="text-lg font-bold">
+                Are you sure you want to delete?
+              </h3>
+              <p className="py-4">
+                This will permanently remove this item from your wishlist.
+              </p>
+              <div className="modal-action">
+                <button className="btn" disabled={deleteMutation.isLoading}>
+                  nevermind
+                </button>
+                <button
+                  className="btn-error btn"
+                  disabled={deleteMutation.isLoading}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteMutation.mutate({ id: entryIdToDelete as string });
+                  }}
+                >
+                  yup
+                </button>
+              </div>
+            </div>
           </div>
         </main>
       </NavLayout>
@@ -213,16 +255,59 @@ export const createEntryInput = z.object({
 
 const Entries: React.FC<{
   entries: inferProcedureOutput<AppRouter["wishlist"]["getBySlug"]>["entries"];
+  stageForDeletion: (entryId: string) => void;
 }> = (props) => {
   return (
     <div>
-      <h2 className="mt-4 text-lg font-bold">Entries</h2>
+      <div className="divider" />
+      <h2 className="mt-4 mb-4 text-lg font-bold">Entries</h2>
       {props.entries.length === 0 ? (
         <span className="text-lg italic">Nothing on the wishlist yet.</span>
       ) : (
-        props.entries.map((ent) => (
-          <div key={ent.id}>Woah {ent.description}</div>
-        ))
+        <div className="flex flex-col space-y-5">
+          {props.entries.map((ent) => (
+            <div key={ent.id}>
+              <div className="card w-full shadow-xl outline outline-1 outline-gray-200 dark:outline-gray-600">
+                <div className="card-body">
+                  <h2 className="card-title">
+                    {ent.description}
+                    {<span className="font-normal">(${ent.price})</span>}
+                  </h2>
+                  <div className="card-actions justify-end">
+                    <button
+                      className="btn-error btn-square btn-sm btn"
+                      onClick={() => props.stageForDeletion(ent.id)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  {ent.link && (
+                    <Link
+                      className="link-inf link"
+                      href={ent.link}
+                      target="_blank"
+                    >
+                      {ent.link}
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
